@@ -1,0 +1,443 @@
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  TouchableOpacity,
+  ActivityIndicator,
+  TextInput,
+  ScrollView
+} from 'react-native';
+
+const OptionChain = ({ data, onSelect, selectedOptions = [], loading = false }) => {
+  const [filterStrike, setFilterStrike] = useState('');
+  const [sortBy, setSortBy] = useState('strike'); // strike, volume, iv
+  const [showCallsOnly, setShowCallsOnly] = useState(false);
+  const [showPutsOnly, setShowPutsOnly] = useState(false);
+
+  // Filter and sort data
+  const getFilteredData = () => {
+    if (!data || data.length === 0) return [];
+
+    let filtered = [...data];
+
+    // Filter by strike price if entered
+    if (filterStrike) {
+      const strikeValue = parseFloat(filterStrike);
+      if (!isNaN(strikeValue)) {
+        filtered = filtered.filter(item => 
+          Math.abs(item.strike - strikeValue) < 10
+        );
+      }
+    }
+
+    // Sort data
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'strike':
+          return a.strike - b.strike;
+        case 'volume':
+          return (b.callVolume + b.putVolume) - (a.callVolume + a.putVolume);
+        case 'iv':
+          return (b.iv || 0) - (a.iv || 0);
+        default:
+          return a.strike - b.strike;
+      }
+    });
+
+    return filtered;
+  };
+
+  const isOptionSelected = (strike, type) => {
+    return selectedOptions.some(
+      opt => opt.strike === strike && opt.type === type
+    );
+  };
+
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      {/* Filter Section */}
+      <View style={styles.filterSection}>
+        <TextInput
+          style={styles.filterInput}
+          placeholder="Filter by strike..."
+          value={filterStrike}
+          onChangeText={setFilterStrike}
+          keyboardType="numeric"
+        />
+      </View>
+
+      {/* Sort Options */}
+      <View style={styles.sortSection}>
+        <TouchableOpacity
+          style={[styles.sortButton, sortBy === 'strike' && styles.sortButtonActive]}
+          onPress={() => setSortBy('strike')}
+        >
+          <Text style={[styles.sortButtonText, sortBy === 'strike' && styles.sortButtonTextActive]}>
+            Strike
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.sortButton, sortBy === 'volume' && styles.sortButtonActive]}
+          onPress={() => setSortBy('volume')}
+        >
+          <Text style={[styles.sortButtonText, sortBy === 'volume' && styles.sortButtonTextActive]}>
+            Volume
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.sortButton, sortBy === 'iv' && styles.sortButtonActive]}
+          onPress={() => setSortBy('iv')}
+        >
+          <Text style={[styles.sortButtonText, sortBy === 'iv' && styles.sortButtonTextActive]}>
+            IV
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Column Headers */}
+      <View style={styles.tableHeader}>
+        <View style={styles.callSection}>
+          <Text style={styles.columnHeader}>CALLS</Text>
+        </View>
+        <View style={styles.strikeSection}>
+          <Text style={styles.columnHeader}>STRIKE</Text>
+        </View>
+        <View style={styles.putSection}>
+          <Text style={styles.columnHeader}>PUTS</Text>
+        </View>
+      </View>
+
+      {/* Sub-headers for Calls and Puts */}
+      <View style={styles.subHeader}>
+        {/* Calls Sub-header */}
+        <View style={styles.callSection}>
+          <Text style={styles.subHeaderText}>Bid</Text>
+          <Text style={styles.subHeaderText}>Ask</Text>
+          <Text style={styles.subHeaderText}>Vol</Text>
+        </View>
+
+        {/* Strike - IV */}
+        <View style={styles.strikeSection}>
+          <Text style={styles.subHeaderText}>IV</Text>
+        </View>
+
+        {/* Puts Sub-header */}
+        <View style={styles.putSection}>
+          <Text style={styles.subHeaderText}>Bid</Text>
+          <Text style={styles.subHeaderText}>Ask</Text>
+          <Text style={styles.subHeaderText}>Vol</Text>
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item, index }) => {
+    const callSelected = isOptionSelected(item.strike, 'call');
+    const putSelected = isOptionSelected(item.strike, 'put');
+    const isATM = item.isAtTheMoney || false;
+
+    return (
+      <View style={[styles.row, isATM && styles.atmRow]}>
+        {/* Call Side */}
+        <TouchableOpacity
+          style={[styles.callSection, callSelected && styles.selectedOption]}
+          onPress={() => onSelect({ ...item, type: 'call' })}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.cellText, styles.callText]}>
+            {item.callBid?.toFixed(2) || '-'}
+          </Text>
+          <Text style={[styles.cellText, styles.callText]}>
+            {item.callAsk?.toFixed(2) || '-'}
+          </Text>
+          <Text style={[styles.cellText, styles.volumeText]}>
+            {item.callVolume ? formatVolume(item.callVolume) : '-'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Strike and IV */}
+        <View style={[styles.strikeSection, isATM && styles.atmStrike]}>
+          <Text style={[styles.strikeText, isATM && styles.atmText]}>
+            {item.strike.toFixed(2)}
+          </Text>
+          <Text style={styles.ivText}>
+            {item.iv ? (item.iv * 100).toFixed(1) + '%' : '-'}
+          </Text>
+        </View>
+
+        {/* Put Side */}
+        <TouchableOpacity
+          style={[styles.putSection, putSelected && styles.selectedOption]}
+          onPress={() => onSelect({ ...item, type: 'put' })}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.cellText, styles.putText]}>
+            {item.putBid?.toFixed(2) || '-'}
+          </Text>
+          <Text style={[styles.cellText, styles.putText]}>
+            {item.putAsk?.toFixed(2) || '-'}
+          </Text>
+          <Text style={[styles.cellText, styles.volumeText]}>
+            {item.putVolume ? formatVolume(item.putVolume) : '-'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const formatVolume = (volume) => {
+    if (volume >= 1000000) {
+      return (volume / 1000000).toFixed(1) + 'M';
+    } else if (volume >= 1000) {
+      return (volume / 1000).toFixed(1) + 'K';
+    }
+    return volume.toString();
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No option chain data available</Text>
+      <Text style={styles.emptySubtext}>
+        Try selecting a different symbol or expiration date
+      </Text>
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#2563eb" />
+      <Text style={styles.loadingText}>Loading option chain...</Text>
+    </View>
+  );
+
+  const filteredData = getFilteredData();
+
+  if (loading) {
+    return renderLoadingState();
+  }
+
+  if (!data || data.length === 0) {
+    return renderEmptyState();
+  }
+
+  return (
+    <View style={styles.container}>
+      {renderHeader()}
+      <FlatList
+        data={filteredData}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.strike}-${index}`}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={true}
+        ListEmptyComponent={renderEmptyState}
+        initialNumToRender={20}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+      />
+      
+      {selectedOptions.length > 0 && (
+        <View style={styles.selectionInfo}>
+          <Text style={styles.selectionText}>
+            {selectedOptions.length} option{selectedOptions.length > 1 ? 's' : ''} selected
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  headerContainer: {
+    backgroundColor: '#f9fafb',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  filterSection: {
+    padding: 12,
+  },
+  filterInput: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+  },
+  sortSection: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  sortButton: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  sortButtonActive: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  sortButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  sortButtonTextActive: {
+    color: '#ffffff',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f3f4f6',
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  columnHeader: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#374151',
+    textAlign: 'center',
+  },
+  subHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f9fafb',
+    paddingVertical: 6,
+    borderBottomWidth: 2,
+    borderBottomColor: '#e5e7eb',
+  },
+  subHeaderText: {
+    flex: 1,
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#6b7280',
+    textAlign: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+    paddingVertical: 8,
+    minHeight: 50,
+  },
+  atmRow: {
+    backgroundColor: '#fef3c7',
+  },
+  callSection: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 4,
+  },
+  strikeSection: {
+    flex: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  putSection: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 4,
+  },
+  atmStrike: {
+    backgroundColor: '#fbbf24',
+    borderRadius: 4,
+  },
+  cellText: {
+    flex: 1,
+    fontSize: 12,
+    textAlign: 'center',
+    color: '#374151',
+  },
+  callText: {
+    color: '#059669',
+    fontWeight: '500',
+  },
+  putText: {
+    color: '#dc2626',
+    fontWeight: '500',
+  },
+  volumeText: {
+    color: '#6b7280',
+    fontSize: 11,
+  },
+  strikeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#1f2937',
+  },
+  atmText: {
+    color: '#92400e',
+  },
+  ivText: {
+    fontSize: 10,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  selectedOption: {
+    backgroundColor: '#dbeafe',
+    borderWidth: 1,
+    borderColor: '#2563eb',
+    borderRadius: 4,
+  },
+  listContent: {
+    paddingBottom: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6b7280',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 12,
+  },
+  selectionInfo: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  selectionText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+});
+
+export default OptionChain;
