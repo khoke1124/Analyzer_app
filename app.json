@@ -3,7 +3,7 @@
     "name": "options_analyzer_mobile_app",
     "slug": "options_analyzer_mobile_app",
     "version": "1.0.0",
-    "orientation":qq "portrait",
+    "orientation": "portrait",
      "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
