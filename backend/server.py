@@ -523,7 +523,7 @@ async def get_watchlist(user: dict = Depends(get_current_user)):
         try:
             quote = await get_stock_quote(item["symbol"])
             watchlist.append(quote)
-        except:
+        except Exception:
             watchlist.append({"symbol": item["symbol"], "price": 0, "change": 0})
     return watchlist
 
