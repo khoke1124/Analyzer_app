@@ -484,7 +484,7 @@ async def get_roll_suggestions(strategy_id: str, user: dict = Depends(get_curren
     try:
         quote = await get_stock_quote(strategy["ticker"])
         current_price = quote["price"]
-    except:
+    except Exception:
         current_price = 150.0
     
     options = strategy["options"]
