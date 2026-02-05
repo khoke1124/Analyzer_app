@@ -306,10 +306,10 @@ async def create_strategy(strategy: StrategyCreate, user: dict = Depends(get_cur
     return strategy_doc
 
 @app.get("/api/strategies")
-async def get_strategies(user: dict = Depends(get_current_user), status: Optional[str] = None):
+async def get_strategies(user: dict = Depends(get_current_user), filter_status: Optional[str] = None):
     query = {"user_id": user["id"]}
-    if status:
-        query["status"] = status
+    if filter_status:
+        query["status"] = filter_status
     
     strategies = []
     for s in strategies_collection.find(query).sort("created_at", -1):
