@@ -261,7 +261,8 @@ async def create_strategy(strategy: StrategyCreate, user: dict = Depends(get_cur
     }
     result = strategies_collection.insert_one(strategy_doc)
     strategy_doc["id"] = str(result.inserted_id)
-    del strategy_doc["_id"] if "_id" in strategy_doc else None
+    if "_id" in strategy_doc:
+        del strategy_doc["_id"]
     return strategy_doc
 
 @app.get("/api/strategies")
