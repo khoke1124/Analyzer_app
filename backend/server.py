@@ -81,7 +81,7 @@ class StrategyUpdate(BaseModel):
     notes: Optional[str] = None
     target_profit: Optional[float] = None
     stop_loss: Optional[float] = None
-    status: Optional[str] = None
+    strategy_status: Optional[str] = None
 
 class AdjustmentScenario(BaseModel):
     ticker: str
