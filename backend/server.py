@@ -247,7 +247,7 @@ async def get_option_chain(symbol: str, expiration: Optional[str] = None):
     try:
         quote = await get_stock_quote(symbol)
         current_price = quote["price"]
-    except:
+    except Exception:
         current_price = 150.0  # Fallback
     
     # Generate realistic option chain around current price
