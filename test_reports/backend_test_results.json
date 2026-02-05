@@ -1,0 +1,167 @@
+{
+  "timestamp": "2026-02-05T14:08:32.915795",
+  "total_tests": 26,
+  "passed_tests": 25,
+  "success_rate": 96.15384615384616,
+  "test_details": [
+    {
+      "test_name": "Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:31.969862"
+    },
+    {
+      "test_name": "User Registration",
+      "success": false,
+      "details": "Expected 200, got 400",
+      "timestamp": "2026-02-05T14:08:31.977281",
+      "response_data": {
+        "detail": "Email already registered"
+      }
+    },
+    {
+      "test_name": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.225321"
+    },
+    {
+      "test_name": "Login Token Update",
+      "success": true,
+      "details": "Token updated from login",
+      "timestamp": "2026-02-05T14:08:32.225409"
+    },
+    {
+      "test_name": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.230669"
+    },
+    {
+      "test_name": "Stock Quote - AAPL",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.375860"
+    },
+    {
+      "test_name": "Stock Quote Fields - AAPL",
+      "success": true,
+      "details": "All required fields present: ['symbol', 'price', 'change', 'volume']",
+      "timestamp": "2026-02-05T14:08:32.375944"
+    },
+    {
+      "test_name": "Stock Quote - MSFT",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.471801"
+    },
+    {
+      "test_name": "Stock Quote Fields - MSFT",
+      "success": true,
+      "details": "All required fields present: ['symbol', 'price', 'change', 'volume']",
+      "timestamp": "2026-02-05T14:08:32.471892"
+    },
+    {
+      "test_name": "Option Chain - AAPL",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.574992"
+    },
+    {
+      "test_name": "Option Chain Fields - AAPL",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-02-05T14:08:32.575085"
+    },
+    {
+      "test_name": "Option Chain Data - AAPL",
+      "success": true,
+      "details": "Found 21 option strikes",
+      "timestamp": "2026-02-05T14:08:32.575100"
+    },
+    {
+      "test_name": "Create Strategy",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.579060"
+    },
+    {
+      "test_name": "Strategy ID Extraction",
+      "success": true,
+      "details": "Strategy ID: 6984a4605ad2c1db80134fcd",
+      "timestamp": "2026-02-05T14:08:32.579135"
+    },
+    {
+      "test_name": "Get Strategies",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.582304"
+    },
+    {
+      "test_name": "Get Strategies Response",
+      "success": true,
+      "details": "Found 2 strategies",
+      "timestamp": "2026-02-05T14:08:32.582371"
+    },
+    {
+      "test_name": "Adjustment Analysis",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.584165"
+    },
+    {
+      "test_name": "Adjustment Analysis Fields",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2026-02-05T14:08:32.584214"
+    },
+    {
+      "test_name": "Get Watchlist (Empty)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.586965"
+    },
+    {
+      "test_name": "Add to Watchlist",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.599829"
+    },
+    {
+      "test_name": "Get Watchlist (With Items)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.708616"
+    },
+    {
+      "test_name": "Remove from Watchlist",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.711590"
+    },
+    {
+      "test_name": "Roll Suggestions",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.807193"
+    },
+    {
+      "test_name": "Invalid Stock Symbol",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2026-02-05T14:08:32.911172"
+    },
+    {
+      "test_name": "Invalid Token",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2026-02-05T14:08:32.912949"
+    },
+    {
+      "test_name": "Non-existent Strategy",
+      "success": true,
+      "details": "Status: 404",
+      "timestamp": "2026-02-05T14:08:32.915689"
+    }
+  ]
+}
