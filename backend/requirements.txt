@@ -87,7 +87,7 @@ pyparsing==3.3.2
 pytest==9.0.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.0
-python-jose==3.3.0
+python-jose==3.4.0
 python-multipart==0.0.22
 pytokens==0.4.1
 PyYAML==6.0.3
